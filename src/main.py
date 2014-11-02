@@ -1,0 +1,20 @@
+#main.py
+
+from entity.Entity import *
+from entity.Player import *
+
+from grid.Grid import *
+
+grid = Grid(5,5)
+
+player = Player("Ben",2)
+
+grid.addObject(2,2,player)
+
+print grid.getLocation(2,2)
+print grid.getLocation(4,4)
+
+grid.moveObject(2,2,4,4)
+
+print grid.getLocation(2,2)
+print grid.getLocation(4,4)
