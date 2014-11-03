@@ -1,6 +1,6 @@
 Tabletop-RPG
 ============
-basic client to create topdown maps for tabletop RPG players
+A basic client to create topdown maps for tabletop RPG players.
 
 Requirements
 ------------
