@@ -14,8 +14,8 @@ class Player(Entity):
         
     #gets the name of the player
     def getName(self):
-        return self.getData()[name]
+        return self.getKey("name")
     
     #gets the total steps able to move in one turn
     def getMoveRange(self):
-        return self.getData()[moveRange]
+        return self.getKey("moveRange")

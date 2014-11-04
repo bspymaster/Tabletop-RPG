@@ -21,3 +21,5 @@ print grid.getLocation(4,4)
 
 for k,v in player.getData().iteritems():
     print "%s = %s" % (k, v)
+
+print player.getName()

@@ -14,3 +14,7 @@ class Entity:
         for k,v in self.data.iteritems():
             print "%s = %s" % (k, v)
         """
+    
+    #gets the value at the specific key index
+    def getKey(self,key):
+        return self.getData()[key]
