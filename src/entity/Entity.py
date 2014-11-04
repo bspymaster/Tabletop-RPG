@@ -7,6 +7,17 @@ class Entity:
         for i in args:
             self.getData().update(i)
     
+    #adds a new key to the data dictionary
+    def setKey(self,key,value):
+        self.getData()[key] = value
+        return True
+    
+    #removes the key with the target index and returns the key,value pair as a tuple
+    def removeKey(self,key):
+        value = self.getKey(key)
+        del self.getData()[key]
+        return (key,value)
+    
     #gets the dynamic dictionary of data stored for the object
     def getData(self):
         return self.data

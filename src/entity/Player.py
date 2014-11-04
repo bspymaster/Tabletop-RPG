@@ -9,8 +9,8 @@ class Player(Entity):
             kwargs.update(i)
         Entity.__init__(self,kwargs)
         
-        self.getData()["name"] = name
-        self.getData()["moveRange"] = moveRange
+        self.setKey("name",name)
+        self.setKey("moveRange",moveRange)
         
     #gets the name of the player
     def getName(self):

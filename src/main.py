@@ -22,4 +22,11 @@ print grid.getLocation(4,4)
 for k,v in player.getData().iteritems():
     print "%s = %s" % (k, v)
 
-print player.getName()
+print "name: " + player.getName()
+
+print "energy: " + player.getKey("energy")
+player.removeKey("energy")
+try:
+    print "energy: " + player.getKey("energy")
+except:
+    print "getting 'energy' key failed since it was deleted"
