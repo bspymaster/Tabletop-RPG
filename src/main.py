@@ -9,12 +9,12 @@ grid = Grid(5,5)
 
 player = Player("Ben",2,health = 10,energy = 3000)
 
-grid.addObject(2,2,player)
+grid.setLocation(2,2,player)
 
 print grid.getLocation(2,2)
 print grid.getLocation(4,4)
 
-grid.moveObject(2,2,4,4)
+grid.swapLocation(2,2,4,4)
 
 print grid.getLocation(2,2)
 print grid.getLocation(4,4)

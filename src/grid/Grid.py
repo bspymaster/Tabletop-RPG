@@ -8,23 +8,26 @@ class Grid:
         #populate grid will null objects
         self.grid = [[None for i in range(0,width)] for j in range(0,height)]
     
-    #adds an object to the grid at target location, overwriting current object and returns added object for reference. Returns None if object added is Nonetype
-    def addObject(self,x,y,obj):
-        if not (obj == None):
-            self.getGrid()[x][y] = obj
-            return obj
-        else:
-            return None
-    
-    #replaces an object in the grid with None
+    #replaces an object in the grid with None, returns the object removed
     def removeObject(self,x,y):
-        self.getGrid()[x][y] = None
-        return True
+        return self.setLocation(x,y,None)
     
-    #moves the object to end location, deleting current object there and replacing the start location with None
+    #moves the object to end location, deleting current object there and replacing the start location with None, returns the overwritten object
     def moveObject(self,startX,startY,endX,endY):
-        self.addObject(endX,endY,self.getLocation(startX,startY))
+        removedObject = self.setLocation(endX,endY,self.getLocation(startX,startY))
         self.removeObject(startX,startY)
+        return removedObject
+    
+    #sets the location to the obj and returns what was currently there
+    def setLocation(self,x,y,obj):
+        removedObject = self.getLocation(x,y)
+        self.getGrid()[x][y] = obj
+        return removedObject
+    
+    #switches the objects in the two locations
+    def swapLocation(self,X1,Y1,X2,Y2):
+        tempObject = self.moveObject(X1,Y1,X2,Y2)
+        self.setLocation(X1,Y1,tempObject)
         return True
     
     #returns with of grid
