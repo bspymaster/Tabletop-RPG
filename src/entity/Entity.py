@@ -21,7 +21,7 @@ class Entity:
     #gets the dynamic dictionary of data stored for the object
     def getData(self):
         return self.data
-        """ use this code to printing the items contained in the data dictionary
+        """ use this code for printing the items contained in the data dictionary
         for k,v in self.data.iteritems():
             print "%s = %s" % (k, v)
         """
