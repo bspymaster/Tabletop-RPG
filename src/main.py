@@ -8,6 +8,8 @@ from grid.Grid import *
 
 from randomNums.Dice import *
 
+from network.Client import IncomingThread
+
 #creation
 grid = Grid(5,5)
 
@@ -53,3 +55,30 @@ string += " = "
 string += str(rollInfo[0])
 
 print string
+
+#client processing
+server = socket()
+
+ip = raw_input("Input server IP: ") or "localhost"
+port = raw_input("Input server port: ") or 9000
+print "Connecting to server on %s with port %d...\n" % (ip,port)
+
+server.connect((ip,port))
+username = raw_input("What is your name: ").strip()
+server.send(">>ADD %s\n" % username)
+incoming = IncomingThread()
+incoming.start()
+
+active = True
+while active:
+    message = raw_input()
+    if message.strip():
+        if message.rstrip().lower() == "\\quit":
+            server.send(">>QUIT\n")
+            active = False
+        elif message.split()[0].lower() == "\\private":
+            colon = message.index(":")
+            friend = message[7:colon].strip()
+            server.send(">>PRIVATE %s\n%s\n" % (friend,message[colon+1:]))
+        else:
+            server.send(">>MESSAGE " + message)
