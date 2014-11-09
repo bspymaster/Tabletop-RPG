@@ -10,10 +10,14 @@ from socket import socket
 from threading import Thread
 
 class IncomingThread(Thread):
+    #called once to pass the server instance into the class from outside the class
+    def defineServer(self,server):
+        self.server = server
+    
     def run(self):
         stillChatting = True
         while stillChatting:
-            transmission = server.recv(1024)
+            transmission = self.server.recv(1024)
             lines = transmission.split("\n")[:-1]
             i = 0
             

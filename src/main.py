@@ -9,6 +9,7 @@ from grid.Grid import *
 from randomNums.Dice import *
 
 from network.Client import IncomingThread
+from socket import socket
 
 #creation
 grid = Grid(5,5)
@@ -67,6 +68,7 @@ server.connect((ip,port))
 username = raw_input("What is your name: ").strip()
 server.send(">>ADD %s\n" % username)
 incoming = IncomingThread()
+incoming.defineServer(server)
 incoming.start()
 
 active = True
