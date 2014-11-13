@@ -62,6 +62,7 @@ server = socket()
 
 ip = raw_input("Input server IP: ") or "localhost"
 port = raw_input("Input server port: ") or 9000
+port = int(port)
 print "Connecting to server on %s with port %d...\n" % (ip,port)
 
 server.connect((ip,port))
@@ -75,12 +76,24 @@ active = True
 while active:
     message = raw_input()
     if message.strip():
-        if message.rstrip().lower() == "\\quit":
+        if message.rstrip().lower() == "/quit":
             server.send(">>QUIT\n")
             active = False
-        elif message.split()[0].lower() == "\\private":
+        elif message.split()[0].lower() == "/private":
             colon = message.index(":")
-            friend = message[7:colon].strip()
-            server.send(">>PRIVATE %s\n%s\n" % (friend,message[colon+1:]))
+            target = message[9:colon].strip()
+            server.send(">>PRIVATE %s\n%s\n" % (target,message[colon+1:]))
+        elif message.split()[0].lower() == "/claimmaster":
+            target = message[13:].strip()
+            server.send(">>CLAIMMASTER\n")
+        elif message.split()[0].lower() == "/releasemaster":
+            target = message[15:].strip()
+            server.send(">>RELEASEMASTER\n")
+        elif message.split()[0].lower() == "/mute":
+            target = message[6:].strip()
+            server.send(">>MUTE %s\n" % target)
+        elif message.split()[0].lower() == "/unmute":
+            target = message[8:].strip()
+            server.send(">>UNMUTE %s\n" % target)
         else:
             server.send(">>MESSAGE " + message)

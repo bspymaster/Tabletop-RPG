@@ -9,6 +9,8 @@
 from SocketServer import BaseRequestHandler
 
 clientList = dict()
+mutedPlayers = []
+master = None
 
 def broadcast(message):
     removalList = []
@@ -22,10 +24,16 @@ def broadcast(message):
 class hostProcessor(BaseRequestHandler):
     def handle(self):
         username = "Unknown"
-        brokenClients = []
         active = True
         while active:
-            transmission = self.request.recv(1024)
+            
+            try:
+                transmission = self.request.recv(1024)
+            except:
+                #clientList.pop(username)
+                #broadcast(">>LEFT %s\n" % username)
+                transmission = ">>QUIT\n"
+            
             if transmission:
                 command = transmission.split()[0]
                 data = transmission[1+len(command):]
@@ -34,28 +42,82 @@ class hostProcessor(BaseRequestHandler):
                 if command == ">>ADD":
                     username = data.strip()
                     clientList[username] = self.request
-                    brokenClients += broadcast(">>NEW %s\n" % username)
+                    broadcast(">>NEW %s\n" % username)
+                    
                 #someone sends a message
                 elif command == ">>MESSAGE":
-                    brokenClients += broadcast(">>MESSAGE %s\n%s\n" % (username,data))
+                    if username not in mutedPlayers:
+                        broadcast(">>MESSAGE %s\n%s\n" % (username,data))
+                    else:
+                        self.request.send(">>PRIVATE server\nYou are not allowed to do that.\n")
+                    
                 #someone sends a private message
                 elif command == ">>PRIVATE":
                     rcpt = data.split("\n")[0]
                     if rcpt in clientList:
                         content = data.split("\n")[1]
                         clientList[rcpt].send(">>PRIVATE %s\n%s\n" % (username,content))
+                        
+                #claim admin powers
+                elif command == ">>CLAIMMASTER":
+                    global master
+                    if not master:
+                        master = username
+                        self.request.send(">>PRIVATE server\nYou are now master.\n")
+                    else:
+                        self.request.send(">>PRIVATE server\nMaster is already claimed by %s.\n" % master)
+                
+                #release admin powers
+                elif command == ">>RELEASEMASTER":
+                    global master
+                    if master == username:
+                        master = None
+                        self.request.send(">>PRIVATE server\nYou are no longer master.\n")
+                    else:
+                        self.request.send(">>PRIVATE server\nYou are not master.\n")
+                
+                #puts a user to spectate mode
+                elif command == ">>MUTE":
+                    global master
+                    target = data.split("\n")[0]
+                    if master != username:
+                        self.request.send(">>PRIVATE server\nYou are not master.\n")
+                    else:
+                        try:
+                            clientList[target].send(">>PRIVATE server\nYou are being muted.\n")
+                            self.request.send(">>PRIVATE server\n%s has been muted.\n" % target)
+                            mutedPlayers.append(target)
+                        except:
+                            self.request.send(">>PRIVATE server\nFailed to mute %s.\n" % target)
+                
+                #puts a user to spectate mode
+                elif command == ">>UNMUTE":
+                    global master
+                    target = data.split("\n")[0]
+                    if master != username:
+                        self.request.send(">>PRIVATE server\nYou are not master.\n")
+                    else:
+                        try:
+                            mutedPlayers.remove(target)
+                            self.request.send(">>PRIVATE server\n%s has been unmuted.\n" % target)
+                            clientList[target].send(">>PRIVATE server\nYou are no longer muted.\n")
+                        except:
+                            self.request.send(">>PRIVATE server\nFailed to unmute %s.\n" % target)
+                
                 #client requests to quit
                 elif command == ">>QUIT":
+                    global master
                     active = False
-                    self.request.send(">>GOODBYE\n")
+                    if master == username:
+                        master = None
+                    #`try:` added for later exception handling when client unexpectedly closed
+                    try:
+                        self.request.send(">>GOODBYE\n")
+                    except:
+                        pass
+                    
                 else:
                     active = False
-            
-            #remove all broken connections
-            for client in brokenClients:
-                clientList.pop(client)
-                broadcast(">>LEFT %s\n" % client)
-            brokenClients = []
             
         self.request.close()
         clientList.pop(username)
