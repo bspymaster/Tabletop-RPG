@@ -1,61 +1,15 @@
 #main.py
 
 #importing
-from entity.Entity import *
-from entity.Player import *
+from entity.Entity import Entity
+from entity.Player import Player
 
-from grid.Grid import *
+from grid.Grid import Grid
 
-from randomNums.Dice import *
+from randomNums.Dice import Dice
 
-from network.Client import IncomingThread
+from network.Client import IncomingThread, OutgoingThread
 from socket import socket
-
-#creation
-grid = Grid(5,5)
-
-player = Player("Ben",2,health = 10,energy = 3000)
-
-#test grid manipulation
-grid.setLocation(2,2,player)
-
-print grid.getLocation(2,2)
-print grid.getLocation(4,4)
-
-grid.swapLocation(2,2,4,4)
-
-print grid.getLocation(2,2)
-print grid.getLocation(4,4)
-
-#test player data manipulation
-for k,v in player.getData().iteritems():
-    print "%s = %s" % (k, v)
-
-print "name: " + player.getName()
-
-print "energy: ", player.getKey("energy")
-player.removeKey("energy")
-try:
-    print "energy: ", player.getKey("energy")
-except:
-    print "getting 'energy' key failed since it was deleted"
-
-
-#test rolling
-rollInfo = Dice.complexDieRoll(["d10","d20","d20"],[10,-3,5])
-
-string = ""
-for i in rollInfo[1]:
-    string += (str(i) + " + ")
-
-for i in rollInfo[2]:
-    string += (str(i) + " + ")
-
-string += " = "
-
-string += str(rollInfo[0])
-
-print string
 
 #client processing
 server = socket()
@@ -65,35 +19,24 @@ port = raw_input("Input server port: ") or 9000
 port = int(port)
 print "Connecting to server on %s with port %d...\n" % (ip,port)
 
-server.connect((ip,port))
-username = raw_input("What is your name: ").strip()
-server.send(">>ADD %s\n" % username)
-incoming = IncomingThread()
-incoming.defineServer(server)
-incoming.start()
+ConnectionFailed = False
+try:
+    server.connect((ip,port))
+except:
+    print "Connection to the server failed. The program will now quit."
+    ConnectionFailed = True
 
-active = True
-while active:
-    message = raw_input()
-    if message.strip():
-        if message.rstrip().lower() == "/quit":
-            server.send(">>QUIT\n")
-            active = False
-        elif message.split()[0].lower() == "/private":
-            colon = message.index(":")
-            target = message[9:colon].strip()
-            server.send(">>PRIVATE %s\n%s\n" % (target,message[colon+1:]))
-        elif message.split()[0].lower() == "/claimmaster":
-            target = message[13:].strip()
-            server.send(">>CLAIMMASTER\n")
-        elif message.split()[0].lower() == "/releasemaster":
-            target = message[15:].strip()
-            server.send(">>RELEASEMASTER\n")
-        elif message.split()[0].lower() == "/mute":
-            target = message[6:].strip()
-            server.send(">>MUTE %s\n" % target)
-        elif message.split()[0].lower() == "/unmute":
-            target = message[8:].strip()
-            server.send(">>UNMUTE %s\n" % target)
-        else:
-            server.send(">>MESSAGE " + message)
+if not ConnectionFailed:
+    username = raw_input("What is your name: ").strip()
+
+    server.send(">>ADD %s\n" % username)
+
+    #start thread for recieving messages
+    incoming = IncomingThread()
+    incoming.defineServer(server)
+    incoming.start()
+
+    #start thread for sending messages
+    outgoing = OutgoingThread()
+    outgoing.defineServer(server)
+    outgoing.start()
