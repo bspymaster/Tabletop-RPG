@@ -30,8 +30,6 @@ class hostProcessor(BaseRequestHandler):
             try:
                 transmission = self.request.recv(1024)
             except:
-                #clientList.pop(username)
-                #broadcast(">>LEFT %s\n" % username)
                 transmission = ">>QUIT\n"
             
             if transmission:
@@ -41,6 +39,9 @@ class hostProcessor(BaseRequestHandler):
                 #client requests to join
                 if command == ">>ADD":
                     username = data.strip()
+                    if username in clientList:
+                        username = "user %d" % (len(clientList) + 1)
+                        self.request.send(">>PRIVATE server\nThis person is already logged on. You are now %s.\n" % username)
                     clientList[username] = self.request
                     broadcast(">>NEW %s\n" % username)
                     
