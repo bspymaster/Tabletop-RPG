@@ -13,8 +13,9 @@ active = True
 
 class IncomingThread(Thread):
     #called once to pass the server instance into the class from outside the class
-    def defineServer(self,server):
+    def defineVariables(self,server,log):
         self.server = server
+        self.log = log
     
     def run(self):
         global active
@@ -23,6 +24,7 @@ class IncomingThread(Thread):
                 transmission = self.server.recv(1024)
             except:
                 transmission = ">>PRIVATE client\nYou have been disconnected from the server. The program will now quit. Please press enter to contrinue.\n>>GOODBYE\n"
+                self.log.logEvent("connection dropped")
             lines = transmission.split("\n")[:-1]
             i = 0
             
@@ -50,8 +52,9 @@ class IncomingThread(Thread):
 
 class OutgoingThread(Thread):
     #called once to pass the server instance into the class from outside the class
-    def defineServer(self,server):
+    def defineVariables(self,server,log):
         self.server = server
+        self.log = log
     
     def run(self):
         global active
@@ -64,7 +67,7 @@ class OutgoingThread(Thread):
                         active = False
                     elif message.split()[0].lower() == "/msg":
                         colon = message.index(":")
-                        target = message[9:colon].strip()
+                        target = message[5:colon].strip()
                         self.server.send(">>PRIVATE %s\n%s\n" % (target,message[colon+1:]))
                     elif message.split()[0].lower() == "/claimmaster":
                         target = message[13:].strip()

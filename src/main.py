@@ -10,6 +10,10 @@ from randomNums.Dice import Dice
 
 from network.Client import IncomingThread, OutgoingThread
 from socket import socket
+from log.Logging import Logger
+
+#create a logger for the client
+log = Logger("client")
 
 #client processing
 server = socket()
@@ -33,10 +37,12 @@ if not ConnectionFailed:
 
     #start thread for recieving messages
     incoming = IncomingThread()
-    incoming.defineServer(server)
+    incoming.defineVariables(server,log)
     incoming.start()
 
     #start thread for sending messages
     outgoing = OutgoingThread()
-    outgoing.defineServer(server)
+    outgoing.defineVariables(server,log)
     outgoing.start()
+
+log.closeLog()

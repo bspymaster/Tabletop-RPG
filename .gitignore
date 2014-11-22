@@ -18,6 +18,9 @@ $RECYCLE.BIN/
 *.pyc
 geany_run_script.bat
 
+# log files
+*.log
+
 # =========================
 # Operating System Files
 # =========================
