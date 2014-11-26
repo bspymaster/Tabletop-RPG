@@ -21,6 +21,9 @@ geany_run_script.bat
 # log files
 *.log
 
+# save files
+*.ent
+
 # =========================
 # Operating System Files
 # =========================

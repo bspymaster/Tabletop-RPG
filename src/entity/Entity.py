@@ -1,11 +1,18 @@
 #entity.py
 
+import pickle
+
 class Entity:
-    def __init__(self,*args,**kwargs):
-        self.data = kwargs
-        #PRECONDITION: all *args MUST be dictionaries (used for subclasses)
-        for i in args:
-            self.getData().update(i)
+    def __init__(self,name,load,*args,**kwargs):
+        #PRECONDITION: load must be True or False
+        if not load:
+            self.data = kwargs
+            self.setKey("name",name)
+            #PRECONDITION: all *args MUST be dictionaries (used for subclasses)
+            for i in args:
+                self.getData().update(i)
+        else:
+            self.load(name)
     
     #adds a new key to the data dictionary
     def setKey(self,key,value):
@@ -18,6 +25,10 @@ class Entity:
         del self.getData()[key]
         return (key,value)
     
+    #gets the name of the entity
+    def getName(self):
+        return self.getKey("name")
+    
     #gets the dynamic dictionary of data stored for the object
     def getData(self):
         return self.data
@@ -29,3 +40,15 @@ class Entity:
     #gets the value at the specific key index
     def getKey(self,key):
         return self.getData()[key]
+    
+    #saves current object and all stats
+    def save(self):
+        saveFile = open("saves/%s.ent" % self.getName(),"wb")
+        pickle.dump(self.data,saveFile)
+        saveFile.close()
+    
+    #loads a premade object with all stats
+    def load(self,name):
+        saveFile = open("saves/%s.ent" % name,"rb")
+        self.data = pickle.load(saveFile)
+        saveFile.close()
