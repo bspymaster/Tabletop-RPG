@@ -10,13 +10,21 @@ from socket import socket
 from threading import Thread
 
 active = True
-
+"""
+Used by the client to process data coming in from the server
+"""
 class IncomingThread(Thread):
-    #called once to pass the server instance into the class from outside the class
+    """
+    a method meant to be called once to pass various variables into the class from outside the class
+    @param socket a socket instance that the current server is running on
+    @param Logger a Logger instance that will record events that occur in the Client
+    """
     def defineVariables(self,server,log):
         self.server = server
         self.log = log
-    
+    """
+    a method that will run until the program closes to process data sent from the server
+    """
     def run(self):
         global active
         while active:
@@ -49,13 +57,21 @@ class IncomingThread(Thread):
                     i += 1
                     print "==>",param + " [private]: " + lines[i]
                 i += 1
-
+"""
+Used by the client to process data and send that data to the server
+"""
 class OutgoingThread(Thread):
-    #called once to pass the server instance into the class from outside the class
+    """
+    a method meant to be called once to pass various variables into the class from outside the class
+    @param socket a socket instance that the current server is running on
+    @param Logger a Logger instance that will record events that occur in the Client
+    """
     def defineVariables(self,server,log):
         self.server = server
         self.log = log
-    
+    """
+    a method that will run until the program closes to process data submitted by the user and send that data to the server
+    """
     def run(self):
         global active
         while active:
