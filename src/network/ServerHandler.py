@@ -12,6 +12,10 @@ clientList = dict()
 mutedPlayers = []
 master = None
 
+"""
+used to process and send out a message to all users
+@return List a list of all the broken clients
+"""
 def broadcast(message):
     removalList = []
     for username in clientList:
@@ -20,12 +24,20 @@ def broadcast(message):
         except:
             removalList.append(username)
     return removalList
-
+"""
+A new instance of this class is created for each client that connects to the server. It processes each client request.
+"""
 class HostProcessor(BaseRequestHandler):
+    """
+    a method meant to be called once to pass various variables into the class from outside the class
+    @param Logger a Logger instance that will record events that occur in the Server
+    """
     @classmethod
     def defineVariables(self,log):
         self.log = log
-    
+    """
+    Runs until the program quits and processes all information coming from the client.
+    """
     def handle(self):
         username = "Unknown"
         active = True
