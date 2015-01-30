@@ -17,7 +17,7 @@ class Dice:
     rolls varius types of dice, and adds on modifiers at the end
     @param list a list of strings of the selected die (must be one of the following: "d2", "d6", "d10", "d12", "d20", "d100")
     @param list a list of integers that will modify a die roll
-    @return tuple an integer total of all rolls and modifiers, followed by list of integers of all the numbers rolled, followed by a list of integers of all the modifiers
+    @return tuple an integer total of all rolls and modifiers, followed by a list of integers of all the numbers rolled, followed by a list of integers of all the modifiers
     """
     @classmethod
     def complexDieRoll(self,dieTypes,modifiers):

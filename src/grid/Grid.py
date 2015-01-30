@@ -6,12 +6,12 @@ class Grid:
     @param integer the number of rows of the grid
     @param integer the number of columns of the grid
     """
-    def __init__(self,width,height):
-        self.width = width
-        self.height = height
+    def __init__(self,rows,cols):
+        self.rows = rows
+        self.cols = cols
         
         #populate grid will null objects
-        self.grid = [[None for i in range(0,width)] for j in range(0,height)]
+        self.grid = [[None for i in range(0,rows)] for j in range(0,cols)]
     
     """
     replaces an object in the grid with None, returns the object removed
@@ -61,18 +61,18 @@ class Grid:
         return True
     
     """
-    gets the width of the grid
+    gets the number of rows of the grid
     @return integer the number of rows in the grid
     """
-    def getWidth(self):
-        return self.width
+    def getRows(self):
+        return self.rows
     
     """
-    gets the height of the grid
+    gets the number of columns of the grid
     @return integer the number of columns in the grid
     """
-    def getHeight(self):
-        return self.height
+    def getCols(self):
+        return self.cols
     
     """
     gets the grid object

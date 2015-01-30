@@ -97,6 +97,10 @@ class OutgoingThread(Thread):
                     elif message.split()[0].lower() == "/unmute":
                         target = message[8:].strip()
                         self.server.send(">>UNMUTE %s\n" % target)
+                    elif message.split()[0].lower() == "/newgrid":
+                        self.server.send(">>NEWGRID %s\n%s\n" %(message.split()[1],message.split()[2]))
+                    elif message.split()[0].lower() == "/placeobj":
+                        self.server.send(">>PLACEOBJECT %s\n%s\n%s" %(message.split()[1],message.split()[2],message[(len(message.split()[0])+len(message.split()[1])+len(message.split()[2])):]))
                     elif message.split()[0].lower() == "/help":
                         print("COMMAND                FUNCTION\n-------                --------\n/quit                  Quits the server.\n/msg <target>: <msg>   Sends a private message to a target person.\n/claimmaster           Claims yourself for master role.\n/releasemaster         Releases master role for others to take. (master only)\n/mute <target>         Stops a target person from sending global messages. (master only)\n/unmute <target>       Allows a target person to send global messages again. (master only)")
                     elif message.split()[0].lower()[0] == "/":

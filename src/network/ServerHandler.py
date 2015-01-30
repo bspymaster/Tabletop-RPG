@@ -7,6 +7,8 @@
 """
 
 from SocketServer import BaseRequestHandler
+from grid.Grid import *
+from Queue import *
 
 clientList = dict()
 mutedPlayers = []
@@ -31,10 +33,12 @@ class HostProcessor(BaseRequestHandler):
     """
     a method meant to be called once to pass various variables into the class from outside the class
     @param Logger a Logger instance that will record events that occur in the Server
+    @param Queue a Queue instance used to transport data to other threads existing in the server
     """
     @classmethod
-    def defineVariables(self,log):
+    def defineVariables(self,log,infoPasser):
         self.log = log
+        self.queue = infoPasser
     """
     Runs until the program quits and processes all information coming from the client.
     """
@@ -54,6 +58,10 @@ class HostProcessor(BaseRequestHandler):
                 command = transmission.split()[0]
                 data = transmission[1+len(command):]
                 
+                ############################
+                #GENERAL CLIENT PROCESSING
+                ############################
+                
                 #client requests to join
                 if command == ">>ADD":
                     username = data.strip()
@@ -66,6 +74,24 @@ class HostProcessor(BaseRequestHandler):
                     clientList[username] = self.request
                     broadcast(">>NEW %s\n" % username)
                     self.log.logEvent("%s joined the chatroom" %username)
+                
+                #client requests to quit
+                elif command == ">>QUIT":
+                    global master
+                    active = False
+                    if master == username:
+                        master = None
+                        self.log.logEvent("%s released master" % username)
+                    #`try:` added for later exception handling when client unexpectedly closed
+                    try:
+                        self.request.send(">>GOODBYE\n")
+                        self.log.logEvent("%s requested to leave" %username)
+                    except:
+                        pass
+                
+                ############
+                #MESSAGING
+                ############
                     
                 #someone sends a message
                 elif command == ">>MESSAGE":
@@ -86,7 +112,11 @@ class HostProcessor(BaseRequestHandler):
                         self.log.logEvent("%s to %s: %s" %(username,rcpt,content))
                     else:
                         self.request.send(">>PRIVATE server\nmessage failed to send.\n")
-                    
+                
+                ########################
+                #ADMINISTRATIVE POWERS
+                ########################
+                
                 #claim admin powers
                 elif command == ">>CLAIMMASTER":
                     global master
@@ -142,21 +172,16 @@ class HostProcessor(BaseRequestHandler):
                         except:
                             self.request.send(">>PRIVATE server\nFailed to unmute %s.\n" % target)
                             self.log.logEvent("%s failed to unmute %s" %(username,target))
-                    
-                #client requests to quit
-                elif command == ">>QUIT":
-                    global master
-                    active = False
-                    if master == username:
-                        master = None
-                        self.log.logEvent("%s released master" % username)
-                    #`try:` added for later exception handling when client unexpectedly closed
-                    try:
-                        self.request.send(">>GOODBYE\n")
-                        self.log.logEvent("%s requested to leave" %username)
-                    except:
-                        pass
-                    
+                
+                ########################
+                #BOARD PROCESSING
+                ########################
+                
+                elif command == ">>NEWGRID":
+                    self.queue.put((command,data))
+                elif command == ">>PLACEOBJECT":
+                    self.queue.put((command,data))
+                
                 else:
                     active = False
             

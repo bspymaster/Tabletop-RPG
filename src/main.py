@@ -1,9 +1,6 @@
 #main.py
 
 #importing
-from entity.Entity import Entity
-from entity.Player import Player
-
 from grid.Grid import Grid
 
 from randomNums.Dice import Dice
